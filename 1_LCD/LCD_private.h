@@ -1,0 +1,15 @@
+#ifndef LCD_PRIVATE_H
+#define LCD_PRIVATE_H
+ 
+#define LCD_CLEAR 0x01
+#define LCD_HOME 0x02
+#define LCD_ENTRY_MODE 0x06
+#define LCD_DISPLAYOFF 0x08
+#define LCD_DISPLAYON 0x0C
+#define LCD_FUNCTION_RESET 0x30 // LCD RESET
+#define LCD_FUNCTIONSET_8BIT 0X38 // 2 LINE DISPLAY 5*7 FONT (5*10 IS DEFUALT)
+#define LCD_SETCURSOR 0x80
+
+static void LCD_voidPutOnBus(u8 u8Char);
+
+#endif // LCD_PRIVATE_H
