@@ -1,0 +1,93 @@
+#include "Std_Types.h"
+#include "Bit_Math.h"
+
+#include "USART_int.h"
+#include "USART_private.h"
+#include "USART_config.h"
+
+void USART_voidInitialization(void)
+{
+#if USART_MODE == ASYNC_MODE
+	CLR_BIT(UCSRC, UMSEL);
+
+	#if (USART_SPEED == DOUBLE_SPEED)
+		SET_BIT(UCSRA, U2X);
+	#elif (USART_SPEED == NORMAL_SPEED)
+		CLR_BIT(UCSRA, U2X);
+	#endif
+
+	UBRRL = USART_BAUDRATE;
+
+#elif (USART_MODE == SYNC_MODE)
+	SET_BIT(UCSRC, UMSEL);
+
+	#if (USART_CLOCK == RISING_EDGE)
+		SET_BIT(UCSRC, UCPOL);
+	#elif (USART_CLOCK == FALLING_EDGE)
+		CLR_BIT(UCSRC, UCPOL);
+	#endif
+#endif
+
+#if (USART_PARITY == PARITY_DISABLE)
+	CLR_BIT(UCSRC, UPM0);
+	CLR_BIT(UCSRC, UPM1);
+
+#elif (USART_PARITY == EVEN_PARITY)
+	CLR_BIT(UCSRC, UPM0);
+	SET_BIT(UCSRC, UPM1);
+
+#elif (USART_PARITY == ODD_PARITY)
+	SET_BIT(UCSRC, UPM0);
+	SET_BIT(UCSRC, UPM1);
+#endif
+
+#if (USART_STOP_BIT == ONE_STOP_BIT)
+	CLR_BIT(UCSRC, USBS);
+
+#elif (USART_STOP_BIT == TWO_STOP_BIT)
+	SET_BIT(UCSRC, USBS);
+#endif
+
+#if (USART_DATA_SIZE == DATA_5_BIT)
+	CLR_BIT(UCSRB, UCSZ2);
+	CLR_BIT(UCSRC, UCSZ1);
+	CLR_BIT(UCSRC, UCSZ0);
+
+#elif (USART_DATA_SIZE == DATA_6_BIT)
+	CLR_BIT(UCSRB, UCSZ2);
+	CLR_BIT(UCSRC, UCSZ1);
+	SET_BIT(UCSRC, UCSZ0);
+
+#elif (USART_DATA_SIZE == DATA_7_BIT)
+	CLR_BIT(UCSRB, UCSZ2);
+	SET_BIT(UCSRC, UCSZ1);
+	CLR_BIT(UCSRC, UCSZ0);
+
+#elif (USART_DATA_SIZE == DATA_8_BIT)
+	CLR_BIT(UCSRB, UCSZ2);
+	SET_BIT(UCSRC, UCSZ1);
+	SET_BIT(UCSRC, UCSZ0);
+
+#elif (USART_DATA_SIZE == DATA_9_BIT)
+	SET_BIT(UCSRB, UCSZ2);
+	SET_BIT(UCSRC, UCSZ1);
+	SET_BIT(UCSRC, UCSZ0);
+#endif
+
+	SET_BIT(UCSRB, RXEN);
+	SET_BIT(UCSRB, TXEN);
+}
+
+void USART_voidTransmit(u8 u8Data)
+{
+	while(GET_BIT(UCSRA, UDRE) == 0);
+
+	UDR = u8Data;
+}
+
+u8 USART_u8Receive(void)
+{
+	while(GET_BIT(UCSRA, RXC) == 0);
+
+	return UDR;
+}
